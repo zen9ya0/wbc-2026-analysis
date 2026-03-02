@@ -23,6 +23,9 @@ interface GroupResponse {
     matches_remaining: { team_a_id: string; team_b_id: string }[];
 }
 
+// 舊版 placeholder 已改為 COL/BRA/TPE/NIC，若 API 仍回傳則不顯示
+const OBSOLETE_TEAM_IDS = ['Q1', 'Q2', 'Q3', 'Q4'];
+
 const FLAG_MAP: Record<string, string> = {
     'JPN': '🇯🇵', 'USA': '🇺🇸', 'PUR': '🇵🇷', 'CUB': '🇨🇺', 'CAN': '🇨🇦',
     'MEX': '🇲🇽', 'VEN': '🇻🇪', 'DOM': '🇩🇴', 'KOR': '🇰🇷', 'AUS': '🇦🇺',
@@ -57,7 +60,9 @@ export const Groups = () => {
     }, [selectedGroup]);
 
     const groupTeams = groupData?.teams
-        ? [...groupData.teams].sort((a, b) => b.p_advance - a.p_advance)
+        ? [...groupData.teams]
+            .filter((t) => !OBSOLETE_TEAM_IDS.includes(t.team_id))
+            .sort((a, b) => b.p_advance - a.p_advance)
         : [];
 
     const getTeamName = (team: GroupTeam) => {

@@ -17,6 +17,7 @@ export interface ScheduleMatch {
     score_a: number | null;
     score_b: number | null;
     status: string;
+    scheduled_date?: string; // YYYY-MM-DD 比賽日期
 }
 
 export interface GroupScheduleResponse {
@@ -127,6 +128,9 @@ export const GroupSchedule = ({ groupId, groupLabel, onBack }: GroupScheduleProp
                             <th className="px-6 py-4 font-bold text-slate-500 uppercase tracking-wider text-sm">
                                 {t('dashboard.match') ?? '對戰'}
                             </th>
+                            <th className="px-6 py-4 font-bold text-slate-500 uppercase tracking-wider text-sm">
+                                {t('dashboard.date') ?? '比賽日期'}
+                            </th>
                             <th className="px-6 py-4 font-bold text-slate-500 uppercase tracking-wider text-sm text-center">
                                 {t('dashboard.score') ?? '比分'}
                             </th>
@@ -152,6 +156,11 @@ export const GroupSchedule = ({ groupId, groupLabel, onBack }: GroupScheduleProp
                                         <span className="text-2xl">{FLAG_MAP[m.team_b_id] ?? '🏳️'}</span>
                                         <span className="font-bold text-slate-800">{m.team_b_id}</span>
                                     </div>
+                                </td>
+                                <td className="px-6 py-4 text-slate-600 whitespace-nowrap">
+                                    {m.scheduled_date
+                                        ? new Date(m.scheduled_date + 'Z').toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric', year: 'numeric' })
+                                        : '–'}
                                 </td>
                                 <td className="px-6 py-4 text-center">
                                     {m.status === 'final' && m.score_a != null && m.score_b != null ? (

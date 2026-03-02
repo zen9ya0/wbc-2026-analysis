@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { Navigation2, Trophy, AlertTriangle, Target, Loader2, AlertCircle } from 'lucide-react';
+import { Navigation2, Trophy, AlertTriangle, Target, Loader2, AlertCircle, ChevronDown } from 'lucide-react';
 import { fetchWithFallback } from '../api/cache';
 
 interface Team {
@@ -42,6 +42,8 @@ interface RouteResponse {
     sensitivity: { match: string; importance: string }[];
 }
 
+const OBSOLETE_TEAM_IDS = ['Q1', 'Q2', 'Q3', 'Q4'];
+
 const FLAG_MAP: Record<string, string> = {
     'JPN': '🇯🇵', 'USA': '🇺🇸', 'PUR': '🇵🇷', 'CUB': '🇨🇺', 'CAN': '🇨🇦',
     'MEX': '🇲🇽', 'VEN': '🇻🇪', 'DOM': '🇩🇴', 'KOR': '🇰🇷', 'AUS': '🇦🇺',
@@ -60,14 +62,26 @@ export const Predict = () => {
     const [error, setError] = useState<string | null>(null);
     const [fromCache, setFromCache] = useState(false);
     const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+    const [selectOpen, setSelectOpen] = useState(false);
+    const selectRef = useRef<HTMLDivElement>(null);
 
     const apiBase = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (selectRef.current && !selectRef.current.contains(e.target as Node)) setSelectOpen(false);
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     useEffect(() => {
         const load = async () => {
             const result = await fetchWithFallback<Team[]>(`${apiBase}/v1/teams`, 'teams');
             if (result.data) {
-                const data = result.data.sort((a, b) => (b.p_advance ?? 0) - (a.p_advance ?? 0));
+                const data = result.data
+                    .filter((t) => !OBSOLETE_TEAM_IDS.includes(t.id))
+                    .sort((a, b) => (b.p_advance ?? 0) - (a.p_advance ?? 0));
                 setTeams(data);
                 if (data.length && !selectedTeamId) setSelectedTeamId(data[0].id);
             }
@@ -130,21 +144,57 @@ export const Predict = () => {
                 </div>
             )}
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                <div>
+                <div className="w-full sm:w-72" ref={selectRef}>
                     <label className="block text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">
                         {t('predict.select_team')}
                     </label>
-                    <select
-                        value={selectedTeamId}
-                        onChange={(e) => { setSelectedTeamId(e.target.value); setRoute(null); setRouteMode(null); }}
-                        className="w-full sm:w-72 px-4 py-3 rounded-2xl border border-slate-200 bg-white font-bold text-brand-navy focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue"
-                    >
-                        {teams.map((team) => (
-                            <option key={team.id} value={team.id}>
-                                {FLAG_MAP[team.id] || '🚩'} {getTeamName(team)} (Group {team.group_id})
-                            </option>
-                        ))}
-                    </select>
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() => setSelectOpen((o) => !o)}
+                            className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-2xl border border-slate-200 bg-white font-bold text-brand-navy shadow-sm hover:border-slate-300 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue transition-all text-left"
+                        >
+                            {selectedTeam ? (
+                                <span className="flex items-center gap-2 truncate">
+                                    <span className="text-xl shrink-0">{FLAG_MAP[selectedTeam.id] || '🚩'}</span>
+                                    <span className="truncate">{getTeamName(selectedTeam)} (Group {selectedTeam.group_id})</span>
+                                </span>
+                            ) : (
+                                <span className="text-slate-400">{t('predict.select_team')}</span>
+                            )}
+                            <ChevronDown size={20} className={`shrink-0 text-slate-400 transition-transform ${selectOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        <AnimatePresence>
+                            {selectOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -4 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -4 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="absolute z-50 mt-2 w-full rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/50 py-2 max-h-72 overflow-auto"
+                                >
+                                    {teams
+                                        .filter((t) => !OBSOLETE_TEAM_IDS.includes(t.id))
+                                        .map((team) => (
+                                            <button
+                                                key={team.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedTeamId(team.id);
+                                                    setRoute(null);
+                                                    setRouteMode(null);
+                                                    setSelectOpen(false);
+                                                }}
+                                                className={`w-full flex items-center gap-3 px-4 py-3 text-left font-bold transition-colors mx-1 rounded-xl ${selectedTeamId === team.id ? 'bg-brand-blue/10 text-brand-navy' : 'text-slate-700 hover:bg-slate-50'}`}
+                                            >
+                                                <span className="text-xl shrink-0">{FLAG_MAP[team.id] || '🚩'}</span>
+                                                <span className="truncate">{getTeamName(team)} (Group {team.group_id})</span>
+                                            </button>
+                                        ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 </div>
                 <div className="flex gap-3">
                     <button

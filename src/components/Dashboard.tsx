@@ -18,6 +18,13 @@ const FLAG_MAP: Record<string, string> = {
     'ISR': '🇮🇱', 'COL': '🇨🇴', 'BRA': '🇧🇷', 'TPE': '🇹🇼', 'NIC': '🇳🇮'
 };
 
+const TEAM_NAME_MAP: Record<string, string> = {
+    PUR: 'Puerto Rico', CUB: 'Cuba', CAN: 'Canada', PAN: 'Panama', COL: 'Colombia',
+    USA: 'USA', MEX: 'Mexico', ITA: 'Italy', GBR: 'Great Britain', BRA: 'Brazil',
+    JPN: 'Japan', AUS: 'Australia', KOR: 'South Korea', CZE: 'Czechia', TPE: 'Chinese Taipei',
+    VEN: 'Venezuela', DOM: 'Dominican Republic', NED: 'Netherlands', ISR: 'Israel', NIC: 'Nicaragua'
+};
+
 export const Dashboard = () => {
     const { t } = useTranslation();
     const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
@@ -79,9 +86,17 @@ export const Dashboard = () => {
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {group.teams.map(teamId => (
-                                        <div key={teamId} className="bg-slate-50 px-3 py-1.5 rounded-lg flex items-center gap-2 border border-slate-100">
-                                            <span className="text-xl">{FLAG_MAP[teamId]}</span>
-                                            <span className="font-bold text-slate-700 text-sm">{teamId}</span>
+                                        <div
+                                            key={teamId}
+                                            title={TEAM_NAME_MAP[teamId] ?? teamId}
+                                            className="bg-white rounded-lg flex items-center gap-2 border border-slate-200 shadow-sm overflow-hidden hover:border-brand-blue/30 hover:shadow transition-all"
+                                        >
+                                            <span className="flex items-center justify-center w-9 h-9 bg-slate-50 border-r border-slate-100 text-xl shrink-0" aria-hidden>
+                                                {FLAG_MAP[teamId] ?? '🏳️'}
+                                            </span>
+                                            <span className="font-bold text-slate-800 text-xs uppercase tracking-wide px-2.5 py-1.5">
+                                                {teamId}
+                                            </span>
                                         </div>
                                     ))}
                                 </div>

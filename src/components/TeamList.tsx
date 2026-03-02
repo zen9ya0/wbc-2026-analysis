@@ -14,6 +14,8 @@ interface Team {
     p_advance?: number;
 }
 
+const OBSOLETE_TEAM_IDS = ['Q1', 'Q2', 'Q3', 'Q4'];
+
 const FLAG_MAP: Record<string, string> = {
     'JPN': '🇯🇵', 'USA': '🇺🇸', 'PUR': '🇵🇷', 'CUB': '🇨🇺', 'CAN': '🇨🇦',
     'MEX': '🇲🇽', 'VEN': '🇻🇪', 'DOM': '🇩🇴', 'KOR': '🇰🇷', 'AUS': '🇦🇺',
@@ -38,10 +40,13 @@ export const TeamList = ({ onSelect }: TeamListProps) => {
         const load = async () => {
             const result = await fetchWithFallback<Team[]>(`${apiBase}/v1/teams`, 'teams');
             if (result.data) {
-                const sorted = result.data.map((team) => ({
-                    ...team,
-                    p_advance: team.p_advance ?? (team.strength_pitching + team.strength_batting) / 2,
-                })).sort((a, b) => (b.p_advance ?? 0) - (a.p_advance ?? 0));
+                const sorted = result.data
+                    .filter((t) => !OBSOLETE_TEAM_IDS.includes(t.id))
+                    .map((team) => ({
+                        ...team,
+                        p_advance: team.p_advance ?? (team.strength_pitching + team.strength_batting) / 2,
+                    }))
+                    .sort((a, b) => (b.p_advance ?? 0) - (a.p_advance ?? 0));
                 setTeams(sorted);
             }
             setFromCache(result.fromCache);
