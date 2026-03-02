@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, User, BarChart, Shield, Zap, Target } from 'lucide-react';
+import { ArrowLeft, User, BarChart, Shield, Zap, Target, AlertCircle } from 'lucide-react';
+import { fetchWithFallback } from '../api/cache';
 
 interface Player {
     id: number;
@@ -35,31 +37,38 @@ interface TeamData {
     players: Player[];
 }
 
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-
 export const TeamDetail = ({ teamId, onBack }: TeamDetailProps) => {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [team, setTeam] = useState<TeamData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [fromCache, setFromCache] = useState(false);
+    const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+    const [fetchError, setFetchError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchDetail = async () => {
-            const apiBase = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
-            try {
-                const res = await axios.get(`${apiBase}/v1/teams/${teamId}`);
-                setTeam(res.data);
-            } catch (err) {
-                console.error("Failed to fetch team detail", err);
-            } finally {
-                setLoading(false);
+        const apiBase = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
+        const load = async () => {
+            const result = await fetchWithFallback<{ team?: TeamData; players?: Player[] } & Partial<TeamData>>(
+                `${apiBase}/v1/teams/${teamId}`,
+                `team_${teamId}`,
+            );
+            const raw = result.data;
+            if (raw) {
+                const teamInfo = raw.team
+                    ? { ...raw.team, players: raw.players ?? [] }
+                    : { ...raw, players: raw.players ?? [] };
+                if (teamInfo.id) setTeam(teamInfo as TeamData);
             }
+            setFromCache(result.fromCache);
+            setLastUpdated(result.last_updated ?? (raw && 'generated_at' in raw ? (raw as { generated_at?: string }).generated_at ?? null : null));
+            setFetchError(result.error);
+            setLoading(false);
         };
-        fetchDetail();
+        load();
     }, [teamId]);
 
-    if (loading) return <div className="text-center py-20 animate-pulse text-slate-400">Loading analysis...</div>;
-    if (!team) return <div className="text-center py-20 text-red-400">Team data not found</div>;
+    if (loading) return <div className="text-center py-20 animate-pulse text-slate-400">{t('common.loading')}</div>;
+    if (!team) return <div className="text-center py-20 text-red-400">{t('common.cached_notice')} — {fetchError || 'Team data not found'}</div>;
 
     const getTeamName = () => {
         if (i18n.language === 'ja') return team.name_ja;
@@ -97,6 +106,17 @@ export const TeamDetail = ({ teamId, onBack }: TeamDetailProps) => {
             animate={{ opacity: 1, x: 0 }}
             className="space-y-8"
         >
+            {fromCache && fetchError && (
+                <div className="flex items-center gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800">
+                    <AlertCircle size={20} />
+                    <div>
+                        <p className="font-medium">{t('common.cached_notice')}</p>
+                        {lastUpdated && (
+                            <p className="text-sm opacity-90">{t('common.last_updated')}: {new Date(lastUpdated).toLocaleString()}</p>
+                        )}
+                    </div>
+                </div>
+            )}
             <button
                 onClick={onBack}
                 className="flex items-center gap-2 text-slate-400 hover:text-brand-navy transition-colors font-bold text-sm mb-6"

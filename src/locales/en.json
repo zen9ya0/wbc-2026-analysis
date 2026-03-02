@@ -4,6 +4,7 @@
         "teams": "Teams",
         "groups": "Groups",
         "predict": "Route Predictor",
+        "model": "Model",
         "loading": "Loading...",
         "language": "Language",
         "details": "Team Details",
@@ -13,7 +14,21 @@
     },
     "teams": {
         "p_advance": "Advancement Prob.",
-        "strength": "Strength Index"
+        "strength": "Strength Index",
+        "strength_total": "Total strength",
+        "sort_by": "Sort by",
+        "sort_p_advance": "Advance",
+        "sort_p_champion": "Champion",
+        "sort_strength_total": "Strength",
+        "sort_uncertainty": "Uncertainty",
+        "sort_group": "Group"
+    },
+    "model": {
+        "title": "Model & Data Version",
+        "model_version": "Model version",
+        "data_version": "Data version",
+        "generated_at": "Last updated (UTC)",
+        "description": "Probabilities and routes are from a Monte Carlo simulation. This page shows the version and data timestamp returned by the API."
     },
     "dashboard": {
         "group_a": "Group A - San Juan",

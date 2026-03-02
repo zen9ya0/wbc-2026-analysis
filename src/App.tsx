@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard,
     Users,
     Layers,
     Navigation2,
+    BarChart3,
     Globe2,
     ChevronDown
 } from 'lucide-react';
@@ -21,25 +23,69 @@ import { Dashboard } from './components/Dashboard';
 import { Groups } from './components/Groups';
 import { TeamDetail } from './components/TeamDetail';
 import { Predict } from './components/Predict';
+import { ModelPage } from './components/ModelPage';
+
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
 
 function App() {
     const { t, i18n } = useTranslation();
+    const location = useLocation();
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('dashboard');
     const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
     const [langOpen, setLangOpen] = useState(false);
+    const [meta, setMeta] = useState<{ model_version: string; data_version: string; generated_at: string } | null>(null);
     const langRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        fetch(`${API_BASE}/v1/meta/status`)
+            .then((r) => r.ok ? r.json() : null)
+            .then((d) => d && setMeta({ model_version: d.model_version, data_version: d.data_version, generated_at: d.generated_at }))
+            .catch(() => {});
+    }, []);
+
+    const pathname = location.pathname || '/';
+    useEffect(() => {
+        if (pathname === '/' || pathname === '') {
+            setActiveTab('dashboard');
+            setSelectedTeam(null);
+        } else if (pathname === '/teams') {
+            setActiveTab('teams');
+            setSelectedTeam(null);
+        } else if (pathname.startsWith('/teams/')) {
+            setActiveTab('teams');
+            setSelectedTeam(pathname.replace(/^\/teams\/?/, '') || null);
+        } else if (pathname.startsWith('/groups')) {
+            setActiveTab('groups');
+            setSelectedTeam(null);
+        } else if (pathname === '/predict') {
+            setActiveTab('predict');
+            setSelectedTeam(null);
+        } else if (pathname === '/model') {
+            setActiveTab('model');
+            setSelectedTeam(null);
+        }
+    }, [pathname]);
 
     const navItems = [
         { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
         { id: 'teams', icon: Users, label: t('common.teams') },
         { id: 'groups', icon: Layers, label: t('common.groups') },
         { id: 'predict', icon: Navigation2, label: t('common.predict') },
+        { id: 'model', icon: BarChart3, label: t('common.model') },
     ];
 
-    // 切到「非隊伍」分頁時才清掉已選隊伍，這樣從 Dashboard 點隊伍標籤才能正確顯示該隊詳情
-    useEffect(() => {
-        if (activeTab !== 'teams') setSelectedTeam(null);
-    }, [activeTab]);
+    const goToTab = (tabId: string, teamId?: string | null) => {
+        setActiveTab(tabId);
+        if (tabId === 'teams' && teamId) {
+            setSelectedTeam(teamId);
+            navigate(`/teams/${teamId}`);
+        } else {
+            setSelectedTeam(null);
+            if (tabId === 'dashboard') navigate('/');
+            else navigate(`/${tabId}`);
+        }
+    };
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -74,7 +120,7 @@ function App() {
                         {navItems.map((item) => (
                             <button
                                 key={item.id}
-                                onClick={() => setActiveTab(item.id)}
+                                onClick={() => goToTab(item.id)}
                                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 ${activeTab === item.id
                                     ? 'bg-white text-brand-blue shadow-sm'
                                     : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
@@ -132,9 +178,9 @@ function App() {
                                 )}
                             </AnimatePresence>
                         </div>
-                        <div className="hidden sm:flex bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm items-center gap-2">
+                        <div className="hidden sm:flex bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm items-center gap-2" title={meta ? `${meta.data_version} · ${meta.generated_at ? new Date(meta.generated_at).toLocaleString() : ''}` : ''}>
                             <div className="w-2.5 h-2.5 bg-green-500 rounded-full" />
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">v0.1.0</span>
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{meta?.model_version ?? 'v0.1.0'}</span>
                         </div>
                     </div>
                 </div>
@@ -154,15 +200,17 @@ function App() {
                 <div className="px-6 lg:px-10 pb-12">
                     <section className="bg-white rounded-[40px] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 min-h-[700px]">
                         {selectedTeam ? (
-                            <TeamDetail teamId={selectedTeam} onBack={() => setSelectedTeam(null)} />
+                            <TeamDetail teamId={selectedTeam} onBack={() => goToTab('teams')} />
                         ) : activeTab === 'dashboard' ? (
-                            <Dashboard onSelectTeam={(id) => { setActiveTab('teams'); setSelectedTeam(id); }} />
+                            <Dashboard onSelectTeam={(id) => goToTab('teams', id)} />
                         ) : activeTab === 'teams' ? (
-                            <TeamList onSelect={(id) => setSelectedTeam(id)} />
+                            <TeamList onSelect={(id) => goToTab('teams', id)} />
                         ) : activeTab === 'groups' ? (
                             <Groups />
                         ) : activeTab === 'predict' ? (
                             <Predict />
+                        ) : activeTab === 'model' ? (
+                            <ModelPage />
                         ) : null}
                     </section>
                 </div>

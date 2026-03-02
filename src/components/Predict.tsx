@@ -77,17 +77,19 @@ export const Predict = () => {
 
     useEffect(() => {
         const load = async () => {
-            const result = await fetchWithFallback<Team[]>(`${apiBase}/v1/teams`, 'teams');
-            if (result.data) {
-                const data = result.data
+            const result = await fetchWithFallback<{ teams?: Team[]; generated_at?: string } | Team[]>(`${apiBase}/v1/teams`, 'teams');
+            const raw = result.data;
+            const list = Array.isArray(raw) ? raw : (raw?.teams ?? []);
+            if (list.length) {
+                const data = list
                     .filter((t) => !OBSOLETE_TEAM_IDS.includes(t.id))
                     .sort((a, b) => (b.p_advance ?? 0) - (a.p_advance ?? 0));
                 setTeams(data);
-                if (data.length && !selectedTeamId) setSelectedTeamId(data[0].id);
+                if (!selectedTeamId) setSelectedTeamId(data[0].id);
             }
             if (result.error) setError(t('predict.api_error'));
             setFromCache(result.fromCache);
-            setLastUpdated(result.last_updated);
+            setLastUpdated(!Array.isArray(raw) && raw?.generated_at ? raw.generated_at : result.last_updated ?? null);
             setLoadingTeams(false);
         };
         load();

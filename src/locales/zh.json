@@ -4,6 +4,7 @@
     "teams": "隊伍",
     "groups": "分組",
     "predict": "路徑分析",
+    "model": "模型版本",
     "loading": "載入中...",
     "language": "語言",
     "details": "隊伍詳情",
@@ -13,7 +14,21 @@
   },
   "teams": {
     "p_advance": "晉級機率",
-    "strength": "戰力指標"
+    "strength": "戰力指標",
+    "strength_total": "總戰力",
+    "sort_by": "排序",
+    "sort_p_advance": "晉級機率",
+    "sort_p_champion": "奪冠機率",
+    "sort_strength_total": "總戰力",
+    "sort_uncertainty": "不確定度",
+    "sort_group": "分組"
+  },
+  "model": {
+    "title": "模型與資料版本",
+    "model_version": "模型版本",
+    "data_version": "資料版本",
+    "generated_at": "最後更新 (UTC)",
+    "description": "晉級機率與路線來自蒙地卡羅模擬。此頁顯示 API 回傳的版本與資料時間戳。"
   },
   "dashboard": {
     "group_a": "A 組 - 聖胡安 (San Juan)",

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertCircle } from 'lucide-react';
 import { fetchWithFallback } from '../api/cache';
@@ -9,9 +9,24 @@ interface Team {
     name_zh: string;
     name_ja: string;
     name_en: string;
-    strength_pitching: number;
-    strength_batting: number;
+    group_id?: string;
+    strength_pitching?: number;
+    strength_batting?: number;
+    strength_defense?: number;
+    strength_baserunning?: number;
+    uncertainty?: number;
     p_advance?: number;
+    p_champion?: number;
+}
+
+type SortKey = 'p_advance' | 'p_champion' | 'strength_total' | 'uncertainty' | 'group';
+
+function strengthTotal(t: Team): number {
+    const p = t.strength_pitching ?? 0;
+    const b = t.strength_batting ?? 0;
+    const d = t.strength_defense ?? 0;
+    const r = t.strength_baserunning ?? 0;
+    return (p + b + d + r) / 4;
 }
 
 const OBSOLETE_TEAM_IDS = ['Q1', 'Q2', 'Q3', 'Q4'];
@@ -29,33 +44,49 @@ interface TeamListProps {
 
 export const TeamList = ({ onSelect }: TeamListProps) => {
     const { t, i18n } = useTranslation();
-    const [teams, setTeams] = useState<Team[]>([]);
     const [loading, setLoading] = useState(true);
     const [fromCache, setFromCache] = useState(false);
     const [lastUpdated, setLastUpdated] = useState<string | null>(null);
     const [fetchError, setFetchError] = useState<string | null>(null);
+    const [sortBy, setSortBy] = useState<SortKey>('p_advance');
+    const [rawTeams, setRawTeams] = useState<Team[]>([]);
 
     useEffect(() => {
         const apiBase = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
         const load = async () => {
-            const result = await fetchWithFallback<Team[]>(`${apiBase}/v1/teams`, 'teams');
-            if (result.data) {
-                const sorted = result.data
-                    .filter((t) => !OBSOLETE_TEAM_IDS.includes(t.id))
+            const result = await fetchWithFallback<{ teams?: Team[]; generated_at?: string } | Team[]>(`${apiBase}/v1/teams`, 'teams');
+            const raw = result.data;
+            const list = Array.isArray(raw) ? raw : (raw?.teams ?? []);
+            if (list.length) {
+                const normalized = list
+                    .filter((x) => !OBSOLETE_TEAM_IDS.includes(x.id))
                     .map((team) => ({
                         ...team,
-                        p_advance: team.p_advance ?? (team.strength_pitching + team.strength_batting) / 2,
-                    }))
-                    .sort((a, b) => (b.p_advance ?? 0) - (a.p_advance ?? 0));
-                setTeams(sorted);
+                        p_advance: team.p_advance ?? ((team.strength_pitching ?? 0) + (team.strength_batting ?? 0)) / 2,
+                    }));
+                setRawTeams(normalized);
             }
             setFromCache(result.fromCache);
-            setLastUpdated(result.last_updated);
+            setLastUpdated(!Array.isArray(raw) && raw?.generated_at ? raw.generated_at : result.last_updated ?? null);
             setFetchError(result.error);
             setLoading(false);
         };
         load();
     }, []);
+
+    const sortedTeams = useMemo(() => {
+        return [...rawTeams].sort((a, b) => {
+            if (sortBy === 'p_advance') return (b.p_advance ?? 0) - (a.p_advance ?? 0);
+            if (sortBy === 'p_champion') return (b.p_champion ?? 0) - (a.p_champion ?? 0);
+            if (sortBy === 'strength_total') return strengthTotal(b) - strengthTotal(a);
+            if (sortBy === 'uncertainty') return (a.uncertainty ?? 0) - (b.uncertainty ?? 0);
+            if (sortBy === 'group') {
+                const g = (x: Team) => (x.group_id ?? 'Z').charCodeAt(0);
+                return g(a) !== g(b) ? g(a) - g(b) : (b.p_advance ?? 0) - (a.p_advance ?? 0);
+            }
+            return 0;
+        });
+    }, [rawTeams, sortBy]);
 
     const getTeamName = (team: Team) => {
         if (i18n.language === 'ja') return team.name_ja;
@@ -64,7 +95,7 @@ export const TeamList = ({ onSelect }: TeamListProps) => {
     };
 
     if (loading) return <div className="text-center py-20 text-slate-400">{t('common.loading')}</div>;
-    if (!teams.length && fetchError) {
+    if (!sortedTeams.length && fetchError) {
         return (
             <div className="rounded-2xl bg-amber-50 border border-amber-200 p-6 text-amber-800">
                 <p className="font-medium">{t('common.cached_notice')}</p>
@@ -86,8 +117,23 @@ export const TeamList = ({ onSelect }: TeamListProps) => {
                     </div>
                 </div>
             )}
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span className="text-sm font-bold text-slate-500">{t('teams.sort_by') ?? 'Sort by'}:</span>
+                {(['p_advance', 'p_champion', 'strength_total', 'uncertainty', 'group'] as SortKey[]).map((key) => (
+                    <button
+                        key={key}
+                        type="button"
+                        onClick={() => setSortBy(key)}
+                        className={`px-3 py-1.5 rounded-xl text-sm font-bold transition-all ${sortBy === key
+                            ? 'bg-brand-blue text-white'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                    >
+                        {t(`teams.sort_${key}`) ?? key}
+                    </button>
+                ))}
+            </div>
             <div className="grid grid-cols-1 gap-4">
-                {teams.map((team, index) => (
+                {sortedTeams.map((team, index) => (
                     <motion.div
                         key={team.id}
                         initial={{ opacity: 0, x: -20 }}
@@ -115,10 +161,11 @@ export const TeamList = ({ onSelect }: TeamListProps) => {
                             </div>
                         </div>
                         <div className="text-right min-w-[120px] bg-slate-50 p-2 rounded-xl border border-slate-100 group-hover:bg-white transiton-colors">
-                            <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{t('teams.strength')}</div>
+                            <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{t('teams.strength_total') ?? 'Total'}</div>
                             <div className="text-lg font-black text-brand-navy">
-                                {((team.strength_pitching + team.strength_batting) * 50).toFixed(1)}
+                                {(strengthTotal(team) * 100).toFixed(0)}
                             </div>
+                            <div className="text-[10px] text-slate-400">{team.group_id ?? '—'}</div>
                         </div>
                     </motion.div>
                 ))}

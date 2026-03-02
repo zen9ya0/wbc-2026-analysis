@@ -4,6 +4,7 @@
         "teams": "チーム",
         "groups": "グループ",
         "predict": "進出ルート",
+        "model": "モデル",
         "loading": "読み込み中...",
         "language": "言語",
         "details": "チーム詳細",
@@ -13,7 +14,21 @@
     },
     "teams": {
         "p_advance": "進出確率",
-        "strength": "戦力指標"
+        "strength": "戦力指標",
+        "strength_total": "総戦力",
+        "sort_by": "並び替え",
+        "sort_p_advance": "進出",
+        "sort_p_champion": "優勝",
+        "sort_strength_total": "戦力",
+        "sort_uncertainty": "不確実性",
+        "sort_group": "グループ"
+    },
+    "model": {
+        "title": "モデル・データバージョン",
+        "model_version": "モデルバージョン",
+        "data_version": "データバージョン",
+        "generated_at": "最終更新 (UTC)",
+        "description": "確率とルートはモンテカルロシミュレーションに基づきます。このページはAPIが返すバージョンとデータのタイムスタンプを表示します。"
     },
     "dashboard": {
         "group_a": "グループA - サンフアン",
