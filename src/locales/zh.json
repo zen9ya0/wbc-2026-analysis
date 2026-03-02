@@ -6,7 +6,9 @@
     "predict": "路徑分析",
     "loading": "載入中...",
     "language": "語言",
-    "details": "隊伍詳情"
+    "details": "隊伍詳情",
+    "last_updated": "最後更新",
+    "cached_notice": "目前顯示快取資料，API 無法連線。"
   },
   "teams": {
     "p_advance": "晉級機率",
@@ -24,5 +26,20 @@
     "stadium_c": "Tokyo Dome",
     "stadium_d": "loanDepot park",
     "dates": "2026年3月5日 - 3月11日"
+  },
+  "predict": {
+    "select_team": "選擇隊伍",
+    "best_case": "最佳路線",
+    "worst_case": "最差路線",
+    "p_advance": "晉級機率",
+    "route_probability": "路線成立機率",
+    "route_prob_hint": "在該隊晉級時，此條件集合成立的機率",
+    "tiebreaker_risk": "同率決勝風險",
+    "must_win": "必勝賽事",
+    "other_results": "其他有利結果",
+    "computing": "計算路線中…",
+    "api_error": "載入失敗，請檢查 API 連線。",
+    "rate_limit": "請求過於頻繁，請稍後再試。",
+    "no_conditions": "此情境下無明顯條件。"
   }
 }

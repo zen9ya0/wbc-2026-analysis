@@ -24,3 +24,14 @@
 3:07:04 PM [vite] page reload src/locales/zh.json
 3:07:09 PM [vite] page reload src/locales/en.json
 3:07:15 PM [vite] page reload src/locales/ja.json
+4:15:03 PM [vite] page reload src/locales/en.json
+4:15:09 PM [vite] page reload src/locales/zh.json
+4:15:12 PM [vite] page reload src/locales/zh.json
+4:15:15 PM [vite] page reload src/locales/ja.json
+4:15:17 PM [vite] hmr update /src/App.tsx
+4:15:20 PM [vite] hmr update /src/App.tsx
+4:15:26 PM [vite] hmr update /src/App.tsx
+4:19:11 PM [vite] page reload src/locales/en.json
+4:19:13 PM [vite] page reload src/locales/zh.json
+4:19:15 PM [vite] page reload src/locales/ja.json
+4:19:45 PM [vite] hmr update /src/components/TeamList.tsx

@@ -5,7 +5,6 @@ import {
     LayoutDashboard,
     Users,
     Layers,
-    BarChart3,
     Navigation2,
     Globe2,
     ChevronDown
@@ -21,6 +20,7 @@ import { TeamList } from './components/TeamList';
 import { Dashboard } from './components/Dashboard';
 import { Groups } from './components/Groups';
 import { TeamDetail } from './components/TeamDetail';
+import { Predict } from './components/Predict';
 
 function App() {
     const { t, i18n } = useTranslation();
@@ -168,21 +168,9 @@ function App() {
                             <TeamList onSelect={(id) => setSelectedTeam(id)} />
                         ) : activeTab === 'groups' ? (
                             <Groups />
-                        ) : (
-                            <div className="flex items-center justify-center h-full min-h-[500px]">
-                                <div className="text-center max-w-sm">
-                                    <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8">
-                                        <BarChart3 size={40} className="text-slate-200" />
-                                    </div>
-                                    <h2 className="text-2xl font-black text-brand-navy mb-3">
-                                        {t('common.predict')} Coming Soon
-                                    </h2>
-                                    <p className="text-slate-400 font-medium leading-relaxed italic">
-                                        "Integrating Monte Carlo simulation results to provide the ultimate advancement route optimizer."
-                                    </p>
-                                </div>
-                            </div>
-                        )}
+                        ) : activeTab === 'predict' ? (
+                            <Predict />
+                        ) : null}
                     </section>
                 </div>
             </main>

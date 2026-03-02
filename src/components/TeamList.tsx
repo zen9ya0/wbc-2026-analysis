@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { AlertCircle } from 'lucide-react';
+import { fetchWithFallback } from '../api/cache';
 
 interface Team {
     id: string;
@@ -28,26 +29,27 @@ export const TeamList = ({ onSelect }: TeamListProps) => {
     const { t, i18n } = useTranslation();
     const [teams, setTeams] = useState<Team[]>([]);
     const [loading, setLoading] = useState(true);
+    const [fromCache, setFromCache] = useState(false);
+    const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+    const [fetchError, setFetchError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchTeams = async () => {
-            const apiBase = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
-            try {
-                const res = await axios.get(`${apiBase}/v1/teams`);
-                // Add fake machine-learning-derived probability if not present
-                const data = res.data.map((team: Team) => ({
+        const apiBase = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
+        const load = async () => {
+            const result = await fetchWithFallback<Team[]>(`${apiBase}/v1/teams`, 'teams');
+            if (result.data) {
+                const sorted = result.data.map((team) => ({
                     ...team,
-                    p_advance: team.p_advance || (team.strength_pitching + team.strength_batting) / 2
-                })).sort((a: Team, b: Team) => (b.p_advance || 0) - (a.p_advance || 0));
-
-                setTeams(data);
-            } catch (err) {
-                console.error("Failed to fetch teams", err);
-            } finally {
-                setLoading(false);
+                    p_advance: team.p_advance ?? (team.strength_pitching + team.strength_batting) / 2,
+                })).sort((a, b) => (b.p_advance ?? 0) - (a.p_advance ?? 0));
+                setTeams(sorted);
             }
+            setFromCache(result.fromCache);
+            setLastUpdated(result.last_updated);
+            setFetchError(result.error);
+            setLoading(false);
         };
-        fetchTeams();
+        load();
     }, []);
 
     const getTeamName = (team: Team) => {
@@ -57,9 +59,28 @@ export const TeamList = ({ onSelect }: TeamListProps) => {
     };
 
     if (loading) return <div className="text-center py-20 text-slate-400">{t('common.loading')}</div>;
+    if (!teams.length && fetchError) {
+        return (
+            <div className="rounded-2xl bg-amber-50 border border-amber-200 p-6 text-amber-800">
+                <p className="font-medium">{t('common.cached_notice')}</p>
+                <p className="text-sm mt-1">{fetchError}</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="w-full">
+        <div className="w-full space-y-4">
+            {fromCache && fetchError && (
+                <div className="flex items-center gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800">
+                    <AlertCircle size={20} />
+                    <div>
+                        <p className="font-medium">{t('common.cached_notice')}</p>
+                        {lastUpdated && (
+                            <p className="text-sm opacity-90">{t('common.last_updated')}: {new Date(lastUpdated).toLocaleString()}</p>
+                        )}
+                    </div>
+                </div>
+            )}
             <div className="grid grid-cols-1 gap-4">
                 {teams.map((team, index) => (
                     <motion.div

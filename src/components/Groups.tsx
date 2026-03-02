@@ -1,18 +1,26 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import axios from 'axios';
-import { Layers, Info } from 'lucide-react';
+import { Layers, Info, AlertCircle } from 'lucide-react';
+import { fetchWithFallback } from '../api/cache';
 
-interface Team {
-    id: string;
+interface GroupTeam {
+    team_id: string;
     name_zh: string;
     name_ja: string;
     name_en: string;
+    p_advance: number;
+    expected_wins: number;
+}
+
+interface GroupResponse {
+    model_version: string;
+    data_version: string;
+    generated_at: string;
     group_id: string;
-    strength_pitching: number;
-    strength_batting: number;
-    p_advance?: number;
+    teams: GroupTeam[];
+    rank_distribution: { team_id: string; rank: number; probability: number }[];
+    matches_remaining: { team_a_id: string; team_b_id: string }[];
 }
 
 const FLAG_MAP: Record<string, string> = {
@@ -24,42 +32,61 @@ const FLAG_MAP: Record<string, string> = {
 
 export const Groups = () => {
     const { t, i18n } = useTranslation();
-    const [teams, setTeams] = useState<Team[]>([]);
-    const [loading, setLoading] = useState(true);
     const [selectedGroup, setSelectedGroup] = useState('A');
+    const [groupData, setGroupData] = useState<GroupResponse | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [fromCache, setFromCache] = useState(false);
+    const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+    const [fetchError, setFetchError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchTeams = async () => {
-            const apiBase = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
-            try {
-                const res = await axios.get(`${apiBase}/v1/teams`);
-                setTeams(res.data);
-            } catch (err) {
-                console.error("Failed to fetch teams", err);
-            } finally {
-                setLoading(false);
-            }
+        const apiBase = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
+        const load = async () => {
+            setLoading(true);
+            const result = await fetchWithFallback<GroupResponse>(
+                `${apiBase}/v1/groups/${selectedGroup}`,
+                `group_${selectedGroup}`
+            );
+            if (result.data) setGroupData(result.data);
+            setFromCache(result.fromCache);
+            setLastUpdated(result.last_updated);
+            setFetchError(result.error);
+            setLoading(false);
         };
-        fetchTeams();
-    }, []);
+        load();
+    }, [selectedGroup]);
 
-    const groupTeams = teams.filter(team => team.group_id === selectedGroup)
-        .sort((a, b) => {
-            const strA = a.strength_pitching + a.strength_batting;
-            const strB = b.strength_pitching + b.strength_batting;
-            return strB - strA;
-        });
+    const groupTeams = groupData?.teams
+        ? [...groupData.teams].sort((a, b) => b.p_advance - a.p_advance)
+        : [];
 
-    const getTeamName = (team: Team) => {
+    const getTeamName = (team: GroupTeam) => {
         if (i18n.language === 'ja') return team.name_ja;
         if (i18n.language === 'en') return team.name_en;
         return team.name_zh;
     };
 
-    if (loading) return <div className="text-center py-20 text-slate-400">{t('common.loading')}</div>;
+    if (loading && !groupData) return <div className="text-center py-20 text-slate-400">{t('common.loading')}</div>;
+    if (!groupData && fetchError) {
+        return (
+            <div className="rounded-2xl bg-amber-50 border border-amber-200 p-6 text-amber-800">
+                <p className="font-medium">{t('common.cached_notice')}</p>
+                <p className="text-sm mt-1">{fetchError}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">
+            {fromCache && fetchError && (
+                <div className="flex items-center gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800">
+                    <AlertCircle size={20} />
+                    <div>
+                        <p className="font-medium">{t('common.cached_notice')}</p>
+                        {lastUpdated && <p className="text-sm opacity-90">{t('common.last_updated')}: {new Date(lastUpdated).toLocaleString()}</p>}
+                    </div>
+                </div>
+            )}
             {/* Group Tabs */}
             <div className="flex bg-slate-100 p-1.5 rounded-2xl w-fit mx-auto">
                 {['A', 'B', 'C', 'D'].map(id => (
@@ -97,39 +124,35 @@ export const Groups = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {groupTeams.map((team, index) => {
-                                    const pAdvance = team.p_advance || (team.strength_pitching + team.strength_batting) / 2;
-                                    return (
-                                        <motion.tr
-                                            key={team.id}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: index * 0.05 }}
-                                            className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors"
-                                        >
-                                            <td className="px-6 py-4">
-                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm ${index < 2 ? 'bg-brand-blue/10 text-brand-blue' : 'bg-slate-100 text-slate-400'
-                                                    }`}>
-                                                    {index + 1}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-2xl">{FLAG_MAP[team.id]}</span>
-                                                    <span className="font-bold text-brand-navy">{getTeamName(team)}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-center font-bold text-slate-400">
-                                                0 - 0
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <span className={`font-black ${index < 2 ? 'text-brand-red' : 'text-slate-400'}`}>
-                                                    {(pAdvance * 100).toFixed(0)}%
-                                                </span>
-                                            </td>
-                                        </motion.tr>
-                                    );
-                                })}
+                                {groupTeams.map((team, index) => (
+                                    <motion.tr
+                                        key={team.team_id}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: index * 0.05 }}
+                                        className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors"
+                                    >
+                                        <td className="px-6 py-4">
+                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm ${index < 2 ? 'bg-brand-blue/10 text-brand-blue' : 'bg-slate-100 text-slate-400'}`}>
+                                                {index + 1}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-2xl">{FLAG_MAP[team.team_id]}</span>
+                                                <span className="font-bold text-brand-navy">{getTeamName(team)}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-center font-bold text-slate-400">
+                                            — / {team.expected_wins.toFixed(1)} exp
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <span className={`font-black ${index < 2 ? 'text-brand-red' : 'text-slate-400'}`}>
+                                                {(team.p_advance * 100).toFixed(0)}%
+                                            </span>
+                                        </td>
+                                    </motion.tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
@@ -144,8 +167,15 @@ export const Groups = () => {
                             Simulation Logic
                         </h4>
                         <p className="text-sm leading-relaxed font-medium opacity-90">
-                            Rankings are derived from <strong>100,000 Monte Carlo iterations</strong> based on current team strength indices.
+                            Rankings are derived from Monte Carlo iterations based on current team strength indices.
                         </p>
+                        {groupData && (
+                            <div className="mt-6 pt-6 border-t border-white/20">
+                                <p className="text-xs font-bold tracking-wide opacity-80">
+                                    Matches remaining: {groupData.matches_remaining.length}
+                                </p>
+                            </div>
+                        )}
                         <div className="mt-8 space-y-4">
                             <div className="flex items-center gap-4">
                                 <div className="w-1.5 h-1.5 bg-brand-red rounded-full"></div>

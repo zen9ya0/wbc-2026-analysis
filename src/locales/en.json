@@ -6,7 +6,9 @@
         "predict": "Route Predictor",
         "loading": "Loading...",
         "language": "Language",
-        "details": "Team Details"
+        "details": "Team Details",
+        "last_updated": "Last updated",
+        "cached_notice": "Showing cached data. API unavailable."
     },
     "teams": {
         "p_advance": "Advancement Prob.",
@@ -24,5 +26,20 @@
         "stadium_c": "Tokyo Dome",
         "stadium_d": "loanDepot park",
         "dates": "March 5th - 11th, 2026"
+    },
+    "predict": {
+        "select_team": "Select team",
+        "best_case": "Best-case route",
+        "worst_case": "Worst-case route",
+        "p_advance": "Advance prob.",
+        "route_probability": "Route probability",
+        "route_prob_hint": "Probability that this condition set holds when the team advances",
+        "tiebreaker_risk": "Tiebreaker risk",
+        "must_win": "Must-win games",
+        "other_results": "Other helpful results",
+        "computing": "Computing route...",
+        "api_error": "Failed to load. Check API connection.",
+        "rate_limit": "Too many requests. Please try again in a few minutes.",
+        "no_conditions": "No strong conditions for this scenario."
     }
 }
