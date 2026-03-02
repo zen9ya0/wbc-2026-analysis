@@ -4,12 +4,10 @@ import {
     LayoutDashboard,
     Users,
     Layers,
-    Calendar,
     BarChart3,
     Navigation2,
     Globe2
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 const languages = [
     { code: 'zh', name: '繁體中文' },
@@ -97,7 +95,7 @@ function App() {
 
                 <section className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm min-h-[600px]">
                     {activeTab === 'dashboard' || activeTab === 'teams' ? (
-                        <TeamList t={t} />
+                        <TeamList />
                     ) : (
                         <div className="flex items-center justify-center h-full min-h-[500px]">
                             <div className="text-center">
