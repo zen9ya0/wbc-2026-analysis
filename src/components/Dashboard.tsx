@@ -11,12 +11,25 @@ const groups = [
     { id: 'D', key: 'group_d', stadiumKey: 'stadium_d', teams: ['VEN', 'DOM', 'NED', 'ISR', 'NIC'] },
 ];
 
+// ISO 3166-1 alpha-2 for FlagCDN (https://flagcdn.com)
+const TEAM_ID_TO_ISO2: Record<string, string> = {
+    PUR: 'pr', CUB: 'cu', CAN: 'ca', PAN: 'pa', COL: 'co',
+    USA: 'us', MEX: 'mx', ITA: 'it', GBR: 'gb', BRA: 'br',
+    JPN: 'jp', AUS: 'au', KOR: 'kr', CZE: 'cz', TPE: 'tw',
+    VEN: 've', DOM: 'do', NED: 'nl', ISR: 'il', NIC: 'ni',
+};
+
 const FLAG_MAP: Record<string, string> = {
     'JPN': '🇯🇵', 'USA': '🇺🇸', 'PUR': '🇵🇷', 'CUB': '🇨🇺', 'CAN': '🇨🇦',
     'MEX': '🇲🇽', 'VEN': '🇻🇪', 'DOM': '🇩🇴', 'KOR': '🇰🇷', 'AUS': '🇦🇺',
     'ITA': '🇮🇹', 'NED': '🇳🇱', 'PAN': '🇵🇦', 'GBR': '🇬🇧', 'CZE': '🇨🇿',
     'ISR': '🇮🇱', 'COL': '🇨🇴', 'BRA': '🇧🇷', 'TPE': '🇹🇼', 'NIC': '🇳🇮'
 };
+
+function getFlagSrc(teamId: string): string | null {
+    const iso2 = TEAM_ID_TO_ISO2[teamId];
+    return iso2 ? `https://flagcdn.com/w80/${iso2}.png` : null;
+}
 
 const TEAM_NAME_MAP: Record<string, string> = {
     PUR: 'Puerto Rico', CUB: 'Cuba', CAN: 'Canada', PAN: 'Panama', COL: 'Colombia',
@@ -89,12 +102,16 @@ export const Dashboard = () => {
                                         <div
                                             key={teamId}
                                             title={TEAM_NAME_MAP[teamId] ?? teamId}
-                                            className="bg-white rounded-lg flex items-center gap-2 border border-slate-200 shadow-sm overflow-hidden hover:border-brand-blue/30 hover:shadow transition-all"
+                                            className="bg-white rounded-xl flex items-center gap-2.5 border border-slate-200 shadow-sm overflow-hidden hover:border-brand-blue/30 hover:shadow transition-all min-w-0"
                                         >
-                                            <span className="flex items-center justify-center w-9 h-9 bg-slate-50 border-r border-slate-100 text-xl shrink-0" aria-hidden>
-                                                {FLAG_MAP[teamId] ?? '🏳️'}
+                                            <span className="flex items-center justify-center w-12 h-9 bg-slate-50 border-r border-slate-100 shrink-0 overflow-hidden">
+                                                {getFlagSrc(teamId) ? (
+                                                    <img src={getFlagSrc(teamId)!} alt="" className="w-full h-full object-cover" width={48} height={36} />
+                                                ) : (
+                                                    <span className="text-xl" aria-hidden>{FLAG_MAP[teamId] ?? '🏳️'}</span>
+                                                )}
                                             </span>
-                                            <span className="font-bold text-slate-800 text-xs uppercase tracking-wide px-2.5 py-1.5">
+                                            <span className="font-bold text-slate-800 text-xs uppercase tracking-wide py-2 pr-3">
                                                 {teamId}
                                             </span>
                                         </div>
