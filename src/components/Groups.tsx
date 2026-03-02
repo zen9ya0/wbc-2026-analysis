@@ -11,6 +11,8 @@ interface GroupTeam {
     name_en: string;
     p_advance: number;
     expected_wins: number;
+    actual_wins?: number;
+    actual_losses?: number;
 }
 
 interface GroupResponse {
@@ -149,7 +151,7 @@ export const Groups = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-center font-bold text-slate-400">
-                                            — / {team.expected_wins.toFixed(1)} exp
+                                            {(team.actual_wins ?? 0)}–{(team.actual_losses ?? 0)} / {team.expected_wins.toFixed(1)} exp
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <span className={`font-black ${index < 2 ? 'text-brand-red' : 'text-slate-400'}`}>

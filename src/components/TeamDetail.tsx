@@ -69,6 +69,23 @@ export const TeamDetail = ({ teamId, onBack }: TeamDetailProps) => {
         { key: 'baserunning', icon: BarChart, label: 'Baserunning', color: 'bg-orange-500' },
     ];
 
+    // 依守位分組，對齊 WBC 官方 (P / C / IF / OF)
+    const POSITION_ORDER = ['P', 'C', 'IF', 'OF'] as const;
+    const POSITION_LABELS: Record<string, string> = { P: 'Pitchers', C: 'Catchers', IF: 'Infielders', OF: 'Outfielders' };
+    const getPositionGroup = (pos: string): string => {
+        const u = pos.toUpperCase();
+        if (u.startsWith('P')) return 'P';
+        if (u.startsWith('C')) return 'C';
+        if (u.includes('IF') || u.startsWith('I')) return 'IF';
+        if (u.includes('OF') || u.startsWith('O')) return 'OF';
+        if (u.includes('D')) return 'IF'; // DH/IF -> IF
+        return 'IF';
+    };
+    const byGroup = POSITION_ORDER.reduce((acc, g) => {
+        acc[g] = team.players.filter((p) => getPositionGroup(p.position) === g);
+        return acc;
+    }, {} as Record<string, Player[]>);
+
     return (
         <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -127,46 +144,54 @@ export const TeamDetail = ({ teamId, onBack }: TeamDetailProps) => {
                     </div>
                 </div>
 
-                {/* Right Side: Roster */}
-                <div className="w-full md:w-[400px]">
-                    <div className="bg-brand-navy rounded-[40px] p-8 text-white shadow-2xl shadow-brand-navy/20 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
-                        <h3 className="text-sm font-black uppercase tracking-[0.2em] mb-8 flex items-center gap-2 opacity-60">
-                            <User size={16} />
-                            Key Roster (Analysts Pick)
+                {/* Right Side: Roster（依守位分組，對齊 WBC 官方） */}
+                <div className="w-full md:w-[360px] shrink-0">
+                    <div className="bg-brand-navy rounded-[32px] p-6 text-white shadow-2xl shadow-brand-navy/20 relative overflow-hidden max-h-[min(70vh,720px)] flex flex-col">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12 blur-2xl" />
+                        <h3 className="text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2 opacity-60 shrink-0">
+                            <User size={14} />
+                            Roster (by position)
                         </h3>
 
-                        <div className="space-y-4">
+                        <div className="overflow-y-auto space-y-5 pr-1 -mr-1">
                             {team.players.length > 0 ? (
-                                team.players.map((p, idx) => (
-                                    <motion.div
-                                        key={p.id}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.2 + idx * 0.1 }}
-                                        className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center font-black text-sm text-white/40">
-                                                #{p.number}
+                                POSITION_ORDER.map((groupKey) => {
+                                    const list = byGroup[groupKey];
+                                    if (!list.length) return null;
+                                    return (
+                                        <div key={groupKey} className="space-y-1.5">
+                                            <div className="text-[10px] font-black uppercase tracking-widest text-white/50 sticky top-0 bg-brand-navy/95 py-1">
+                                                {POSITION_LABELS[groupKey]}
                                             </div>
-                                            <div>
-                                                <div className="font-bold">{p.name}</div>
-                                                <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1">{p.position}</div>
+                                            <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                                                {list.map((p) => (
+                                                    <div
+                                                        key={p.id}
+                                                        className="flex items-center gap-2 py-1.5 px-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                                                    >
+                                                        <span className="w-7 h-7 rounded-md bg-white/10 flex items-center justify-center font-bold text-[10px] text-white/60 shrink-0">
+                                                            #{p.number}
+                                                        </span>
+                                                        <div className="min-w-0">
+                                                            <div className="font-semibold text-sm truncate">{p.name}</div>
+                                                            <div className="text-[9px] text-white/40 uppercase">{p.position}</div>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
-                                    </motion.div>
-                                ))
+                                    );
+                                })
                             ) : (
-                                <div className="text-center py-10 opacity-30 italic text-sm">
+                                <div className="text-center py-8 opacity-30 italic text-sm">
                                     Official roster version coming soon
                                 </div>
                             )}
                         </div>
 
-                        <div className="mt-8 pt-6 border-t border-white/5">
-                            <p className="text-[10px] text-white/20 italic text-center">
-                                *Data verified by Analyst 2026.03.02.01
+                        <div className="mt-4 pt-4 border-t border-white/5 shrink-0">
+                            <p className="text-[9px] text-white/20 italic text-center">
+                                *Roster subject to change. See <a href="https://www.mlb.com/world-baseball-classic" target="_blank" rel="noopener noreferrer" className="underline">MLB.com WBC</a> for official rosters.
                             </p>
                         </div>
                     </div>
