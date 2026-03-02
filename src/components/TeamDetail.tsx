@@ -164,7 +164,7 @@ export const TeamDetail = ({ teamId, onBack }: TeamDetailProps) => {
                                     <div className="grid gap-2">
                                         {list.map((p) => {
                                             const dash = '—';
-                                            const row = (label: string, value: string | null | undefined) =>
+                                            const row = (value: string | null | undefined) =>
                                                 (value != null && value !== '') ? value : dash;
                                             return (
                                                 <div
@@ -181,11 +181,11 @@ export const TeamDetail = ({ teamId, onBack }: TeamDetailProps) => {
                                                         </div>
                                                     </div>
                                                     <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[11px] text-slate-500 mt-2 pl-0">
-                                                        <dt className="font-medium text-slate-400">B/T</dt><dd>{row('B/T', p.bat_throw)}</dd>
-                                                        <dt className="font-medium text-slate-400">H/W</dt><dd>{row('H/W', p.height_weight)}</dd>
-                                                        <dt className="font-medium text-slate-400">W-L</dt><dd>{row('W-L', p.w_l)}</dd>
-                                                        <dt className="font-medium text-slate-400">ERA</dt><dd>{row('ERA', p.era)}</dd>
-                                                        <dt className="font-medium text-slate-400">Birthplace</dt><dd>{row('Birthplace', p.birthplace)}</dd>
+                                                        <dt className="font-medium text-slate-400">B/T</dt><dd>{row(p.bat_throw)}</dd>
+                                                        <dt className="font-medium text-slate-400">H/W</dt><dd>{row(p.height_weight)}</dd>
+                                                        <dt className="font-medium text-slate-400">W-L</dt><dd>{row(p.w_l)}</dd>
+                                                        <dt className="font-medium text-slate-400">ERA</dt><dd>{row(p.era)}</dd>
+                                                        <dt className="font-medium text-slate-400">Birthplace</dt><dd>{row(p.birthplace)}</dd>
                                                     </dl>
                                                 </div>
                                             );
