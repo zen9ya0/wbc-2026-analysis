@@ -27,8 +27,9 @@ export const TeamList = () => {
 
     useEffect(() => {
         const fetchTeams = async () => {
+            const apiBase = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
             try {
-                const res = await axios.get('http://localhost:8000/v1/teams');
+                const res = await axios.get(`${apiBase}/v1/teams`);
                 // Add fake machine-learning-derived probability if not present
                 const data = res.data.map((team: Team) => ({
                     ...team,
