@@ -53,5 +53,9 @@
         "api_error": "読み込みに失敗しました。APIを確認してください。",
         "rate_limit": "リクエストが多すぎます。しばらく待ってください。",
         "no_conditions": "このシナリオでは条件なし。"
+    },
+    "footer": {
+        "data_sources": "データソース",
+        "data_sources_note": "日程・名簿はWBC公式およびプロジェクト資料に基づく。"
     }
 }

@@ -36,9 +36,9 @@ function App() {
         { id: 'predict', icon: Navigation2, label: t('common.predict') },
     ];
 
-    // Reset selected team when changing tabs
+    // 切到「非隊伍」分頁時才清掉已選隊伍，這樣從 Dashboard 點隊伍標籤才能正確顯示該隊詳情
     useEffect(() => {
-        setSelectedTeam(null);
+        if (activeTab !== 'teams') setSelectedTeam(null);
     }, [activeTab]);
 
     useEffect(() => {
@@ -167,6 +167,16 @@ function App() {
                     </section>
                 </div>
             </main>
+
+            {/* Footer: 著作權與資料來源 */}
+            <footer className="border-t border-slate-200 bg-white py-6 px-6 lg:px-10 text-center text-sm text-slate-500">
+                <p className="font-medium text-slate-600">
+                    © {new Date().getFullYear()} 個人 ZENG CHIH YAO 與 AI coding
+                </p>
+                <p className="mt-2">
+                    {t('footer.data_sources') ?? '資料來源'}：{t('footer.data_sources_note') ?? '賽程與隊伍名單以 WBC 官方及專案資料為準'}
+                </p>
+            </footer>
         </div>
     );
 }

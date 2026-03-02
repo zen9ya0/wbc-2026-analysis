@@ -53,5 +53,9 @@
         "api_error": "Failed to load. Check API connection.",
         "rate_limit": "Too many requests. Please try again in a few minutes.",
         "no_conditions": "No strong conditions for this scenario."
+    },
+    "footer": {
+        "data_sources": "Data sources",
+        "data_sources_note": "Schedule and rosters based on WBC official and project data."
     }
 }

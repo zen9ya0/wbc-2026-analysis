@@ -53,5 +53,9 @@
     "api_error": "載入失敗，請檢查 API 連線。",
     "rate_limit": "請求過於頻繁，請稍後再試。",
     "no_conditions": "此情境下無明顯條件。"
+  },
+  "footer": {
+    "data_sources": "資料來源",
+    "data_sources_note": "賽程與隊伍名單以 WBC 官方及專案資料為準"
   }
 }
