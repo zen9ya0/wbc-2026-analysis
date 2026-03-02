@@ -1,23 +1,37 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Trophy } from 'lucide-react';
+import { Calendar, MapPin, Trophy, ChevronRight } from 'lucide-react';
+import { GroupSchedule } from './GroupSchedule';
 
 const groups = [
-    { id: 'A', key: 'group_a', stadiumKey: 'stadium_a', teams: ['PUR', 'CUB', 'CAN', 'PAN', 'Q1'] },
-    { id: 'B', key: 'group_b', stadiumKey: 'stadium_b', teams: ['USA', 'MEX', 'ITA', 'GBR', 'Q2'] },
-    { id: 'C', key: 'group_c', stadiumKey: 'stadium_c', teams: ['JPN', 'AUS', 'KOR', 'CZE', 'Q3'] },
-    { id: 'D', key: 'group_d', stadiumKey: 'stadium_d', teams: ['VEN', 'DOM', 'NED', 'ISR', 'Q4'] },
+    { id: 'A', key: 'group_a', stadiumKey: 'stadium_a', teams: ['PUR', 'CUB', 'CAN', 'PAN', 'COL'] },
+    { id: 'B', key: 'group_b', stadiumKey: 'stadium_b', teams: ['USA', 'MEX', 'ITA', 'GBR', 'BRA'] },
+    { id: 'C', key: 'group_c', stadiumKey: 'stadium_c', teams: ['JPN', 'AUS', 'KOR', 'CZE', 'TPE'] },
+    { id: 'D', key: 'group_d', stadiumKey: 'stadium_d', teams: ['VEN', 'DOM', 'NED', 'ISR', 'NIC'] },
 ];
 
 const FLAG_MAP: Record<string, string> = {
     'JPN': '🇯🇵', 'USA': '🇺🇸', 'PUR': '🇵🇷', 'CUB': '🇨🇺', 'CAN': '🇨🇦',
     'MEX': '🇲🇽', 'VEN': '🇻🇪', 'DOM': '🇩🇴', 'KOR': '🇰🇷', 'AUS': '🇦🇺',
     'ITA': '🇮🇹', 'NED': '🇳🇱', 'PAN': '🇵🇦', 'GBR': '🇬🇧', 'CZE': '🇨🇿',
-    'ISR': '🇮🇱', 'Q1': '🏳️', 'Q2': '🏳️', 'Q3': '🏳️', 'Q4': '🏳️'
+    'ISR': '🇮🇱', 'COL': '🇨🇴', 'BRA': '🇧🇷', 'TPE': '🇹🇼', 'NIC': '🇳🇮'
 };
 
 export const Dashboard = () => {
     const { t } = useTranslation();
+    const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+
+    if (selectedGroupId) {
+        const group = groups.find(g => g.id === selectedGroupId);
+        return (
+            <GroupSchedule
+                groupId={selectedGroupId}
+                groupLabel={group ? t(`dashboard.${group.key}`) : `Group ${selectedGroupId}`}
+                onBack={() => setSelectedGroupId(null)}
+            />
+        );
+    }
 
     return (
         <div className="space-y-8">
@@ -28,12 +42,19 @@ export const Dashboard = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
-                        className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setSelectedGroupId(group.id)}
+                        onKeyDown={(e) => e.key === 'Enter' && setSelectedGroupId(group.id)}
+                        className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md hover:border-brand-blue/20 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
                     >
                         <div className="bg-brand-navy p-4 text-white flex justify-between items-center">
                             <h3 className="font-bold text-lg">{t(`dashboard.${group.key}`)}</h3>
-                            <div className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                                Group {group.id}
+                            <div className="flex items-center gap-2">
+                                <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                    Group {group.id}
+                                </span>
+                                <ChevronRight size={20} className="opacity-80" />
                             </div>
                         </div>
 
@@ -64,6 +85,9 @@ export const Dashboard = () => {
                                         </div>
                                     ))}
                                 </div>
+                                <p className="text-xs text-brand-blue font-medium mt-3 flex items-center gap-1">
+                                    {t('dashboard.view_match_schedule') ?? '查看對戰表'} <ChevronRight size={14} />
+                                </p>
                             </div>
                         </div>
                     </motion.div>

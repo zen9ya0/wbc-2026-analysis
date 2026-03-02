@@ -7,6 +7,7 @@
         "loading": "Loading...",
         "language": "Language",
         "details": "Team Details",
+        "back": "Back",
         "last_updated": "Last updated",
         "cached_notice": "Showing cached data. API unavailable."
     },
@@ -25,7 +26,17 @@
         "stadium_b": "Minute Maid Park",
         "stadium_c": "Tokyo Dome",
         "stadium_d": "loanDepot park",
-        "dates": "March 5th - 11th, 2026"
+        "dates": "March 5th - 11th, 2026",
+        "view_match_schedule": "View match schedule",
+        "match_schedule": "Match schedule",
+        "match": "Match",
+        "score": "Score",
+        "status": "Status",
+        "final": "Final",
+        "scheduled": "Scheduled",
+        "last_updated": "Last updated",
+        "refresh": "Refresh",
+        "auto_update_hint": "Results auto-update every 30 seconds"
     },
     "predict": {
         "select_team": "Select team",
