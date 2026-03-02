@@ -20,7 +20,11 @@ const FLAG_MAP: Record<string, string> = {
     'ISR': '🇮🇱', 'Q1': '🏳️', 'Q2': '🏳️', 'Q3': '🏳️', 'Q4': '🏳️'
 };
 
-export const TeamList = () => {
+interface TeamListProps {
+    onSelect: (teamId: string) => void;
+}
+
+export const TeamList = ({ onSelect }: TeamListProps) => {
     const { t, i18n } = useTranslation();
     const [teams, setTeams] = useState<Team[]>([]);
     const [loading, setLoading] = useState(true);
@@ -63,7 +67,8 @@ export const TeamList = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        className="flex items-center gap-6 p-5 rounded-2xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100 hover:shadow-sm"
+                        onClick={() => onSelect(team.id)}
+                        className="flex items-center gap-6 p-5 rounded-2xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100 hover:shadow-sm cursor-pointer active:scale-98"
                     >
                         <div className="text-4xl w-12 text-center">{FLAG_MAP[team.id] || '🚩'}</div>
                         <div className="flex-1">
@@ -83,7 +88,7 @@ export const TeamList = () => {
                                 ></motion.div>
                             </div>
                         </div>
-                        <div className="text-right min-w-[120px] bg-slate-50 p-2 rounded-xl border border-slate-100">
+                        <div className="text-right min-w-[120px] bg-slate-50 p-2 rounded-xl border border-slate-100 group-hover:bg-white transiton-colors">
                             <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{t('teams.strength')}</div>
                             <div className="text-lg font-black text-brand-navy">
                                 {((team.strength_pitching + team.strength_batting) * 50).toFixed(1)}

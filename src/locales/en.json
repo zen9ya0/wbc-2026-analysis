@@ -5,10 +5,24 @@
         "groups": "Groups",
         "predict": "Route Predictor",
         "loading": "Loading...",
-        "language": "Language"
+        "language": "Language",
+        "details": "Team Details"
     },
     "teams": {
         "p_advance": "Advancement Prob.",
         "strength": "Strength Index"
+    },
+    "dashboard": {
+        "group_a": "Group A - San Juan",
+        "group_b": "Group B - Houston",
+        "group_c": "Group C - Tokyo",
+        "group_d": "Group D - Miami",
+        "location": "Location",
+        "schedule": "Schedule",
+        "stadium_a": "Hiram Bithorn Stadium",
+        "stadium_b": "Minute Maid Park",
+        "stadium_c": "Tokyo Dome",
+        "stadium_d": "loanDepot park",
+        "dates": "March 5th - 11th, 2026"
     }
 }

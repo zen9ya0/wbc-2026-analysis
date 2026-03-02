@@ -12,3 +12,15 @@
 12:49:26 PM [vite] changed tsconfig file detected: /home/shar/project/WBS2026/frontend/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
 12:54:36 PM [vite] hmr update /src/App.tsx
 12:57:46 PM [vite] hmr update /src/components/TeamList.tsx
+2:58:40 PM [vite] page reload src/locales/zh.json
+2:58:57 PM [vite] page reload src/locales/en.json
+2:59:12 PM [vite] page reload src/locales/ja.json
+2:59:50 PM [vite] hmr update /src/App.tsx
+3:00:45 PM [vite] hmr update /src/App.tsx
+3:01:48 PM [vite] hmr update /src/App.tsx
+3:05:57 PM [vite] hmr update /src/components/TeamList.tsx
+3:06:17 PM [vite] hmr update /src/components/TeamList.tsx
+3:06:59 PM [vite] hmr update /src/App.tsx
+3:07:04 PM [vite] page reload src/locales/zh.json
+3:07:09 PM [vite] page reload src/locales/en.json
+3:07:15 PM [vite] page reload src/locales/ja.json

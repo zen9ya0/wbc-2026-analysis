@@ -5,10 +5,24 @@
     "groups": "分組",
     "predict": "路徑分析",
     "loading": "載入中...",
-    "language": "語言"
+    "language": "語言",
+    "details": "隊伍詳情"
   },
   "teams": {
     "p_advance": "晉級機率",
     "strength": "戰力指標"
+  },
+  "dashboard": {
+    "group_a": "A 組 - 聖胡安 (San Juan)",
+    "group_b": "B 組 - 休士頓 (Houston)",
+    "group_c": "C 組 - 東京 (Tokyo)",
+    "group_d": "D 組 - 邁阿密 (Miami)",
+    "location": "比賽地點",
+    "schedule": "比賽日期",
+    "stadium_a": "Hiram Bithorn Stadium",
+    "stadium_b": "Minute Maid Park",
+    "stadium_c": "Tokyo Dome",
+    "stadium_d": "loanDepot park",
+    "dates": "2026年3月5日 - 3月11日"
   }
 }

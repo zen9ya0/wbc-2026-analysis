@@ -5,10 +5,24 @@
         "groups": "グループ",
         "predict": "進出ルート",
         "loading": "読み込み中...",
-        "language": "言語"
+        "language": "言語",
+        "details": "チーム詳細"
     },
     "teams": {
         "p_advance": "進出確率",
         "strength": "戦力指標"
+    },
+    "dashboard": {
+        "group_a": "グループA - サンフアン",
+        "group_b": "グループB - ヒューストン",
+        "group_c": "グループC - 東京",
+        "group_d": "グループD - マイアミ",
+        "location": "開催地",
+        "schedule": "日程",
+        "stadium_a": "ヒラム・ビソーン・スタジアム",
+        "stadium_b": "ミニッツメイド・パーク",
+        "stadium_c": "東京ドーム",
+        "stadium_d": "ローンデポ・パーク",
+        "dates": "2026年3月5日 - 3月11日"
     }
 }
