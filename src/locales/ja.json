@@ -37,7 +37,7 @@
         "scheduled": "未開催",
         "last_updated": "最終更新",
         "refresh": "更新",
-        "auto_update_hint": "試合結果は30秒ごとに自動更新"
+        "auto_update_hint": "対戦表は30秒ごとに自動更新"
     },
     "predict": {
         "select_team": "チームを選択",

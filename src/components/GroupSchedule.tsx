@@ -4,6 +4,18 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Calendar, RefreshCw } from 'lucide-react';
 import { fetchWithFallback } from '../api/cache';
 
+const TEAM_ID_TO_ISO2: Record<string, string> = {
+    PUR: 'pr', CUB: 'cu', CAN: 'ca', PAN: 'pa', COL: 'co',
+    USA: 'us', MEX: 'mx', ITA: 'it', GBR: 'gb', BRA: 'br',
+    JPN: 'jp', AUS: 'au', KOR: 'kr', CZE: 'cz', TPE: 'tw',
+    VEN: 've', DOM: 'do', NED: 'nl', ISR: 'il', NIC: 'ni',
+};
+
+function getFlagSrc(teamId: string): string | null {
+    const iso2 = TEAM_ID_TO_ISO2[teamId];
+    return iso2 ? `https://flagcdn.com/w80/${iso2}.png` : null;
+}
+
 const FLAG_MAP: Record<string, string> = {
     'JPN': '🇯🇵', 'USA': '🇺🇸', 'PUR': '🇵🇷', 'CUB': '🇨🇺', 'CAN': '🇨🇦',
     'MEX': '🇲🇽', 'VEN': '🇻🇪', 'DOM': '🇩🇴', 'KOR': '🇰🇷', 'AUS': '🇦🇺',
@@ -117,7 +129,7 @@ export const GroupSchedule = ({ groupId, groupLabel, onBack }: GroupScheduleProp
                 <Calendar size={24} />
                 <div>
                     <h2 className="text-xl font-bold">{groupLabel} – {t('dashboard.match_schedule') ?? '對戰表'}</h2>
-                    <p className="text-white/80 text-sm">{t('dashboard.auto_update_hint') ?? '賽果每 30 秒自動更新'}</p>
+                    <p className="text-white/80 text-sm">{t('dashboard.auto_update_hint') ?? '對戰表每 30 秒自動更新'}</p>
                 </div>
             </div>
 
@@ -150,10 +162,22 @@ export const GroupSchedule = ({ groupId, groupLabel, onBack }: GroupScheduleProp
                             >
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
-                                        <span className="text-2xl">{FLAG_MAP[m.team_a_id] ?? '🏳️'}</span>
+                                        <span className="w-10 h-7 shrink-0 rounded overflow-hidden bg-slate-100">
+                                            {getFlagSrc(m.team_a_id) ? (
+                                                <img src={getFlagSrc(m.team_a_id)!} alt="" className="w-full h-full object-cover" width={40} height={28} />
+                                            ) : (
+                                                <span className="flex items-center justify-center w-full h-full text-lg">{FLAG_MAP[m.team_a_id] ?? '🏳️'}</span>
+                                            )}
+                                        </span>
                                         <span className="font-bold text-slate-800">{m.team_a_id}</span>
                                         <span className="text-slate-300 font-medium">vs</span>
-                                        <span className="text-2xl">{FLAG_MAP[m.team_b_id] ?? '🏳️'}</span>
+                                        <span className="w-10 h-7 shrink-0 rounded overflow-hidden bg-slate-100">
+                                            {getFlagSrc(m.team_b_id) ? (
+                                                <img src={getFlagSrc(m.team_b_id)!} alt="" className="w-full h-full object-cover" width={40} height={28} />
+                                            ) : (
+                                                <span className="flex items-center justify-center w-full h-full text-lg">{FLAG_MAP[m.team_b_id] ?? '🏳️'}</span>
+                                            )}
+                                        </span>
                                         <span className="font-bold text-slate-800">{m.team_b_id}</span>
                                     </div>
                                 </td>

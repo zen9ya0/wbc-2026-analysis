@@ -38,7 +38,12 @@ const TEAM_NAME_MAP: Record<string, string> = {
     VEN: 'Venezuela', DOM: 'Dominican Republic', NED: 'Netherlands', ISR: 'Israel', NIC: 'Nicaragua'
 };
 
-export const Dashboard = () => {
+interface DashboardProps {
+    /** 點擊隊伍標籤時切換到「隊伍」並顯示該隊詳情 */
+    onSelectTeam?: (teamId: string) => void;
+}
+
+export const Dashboard = ({ onSelectTeam }: DashboardProps) => {
     const { t } = useTranslation();
     const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
 
@@ -62,11 +67,7 @@ export const Dashboard = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => setSelectedGroupId(group.id)}
-                        onKeyDown={(e) => e.key === 'Enter' && setSelectedGroupId(group.id)}
-                        className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md hover:border-brand-blue/20 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
+                        className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:border-slate-200 transition-all"
                     >
                         <div className="bg-brand-navy p-4 text-white flex justify-between items-center">
                             <h3 className="font-bold text-lg">{t(`dashboard.${group.key}`)}</h3>
@@ -74,7 +75,6 @@ export const Dashboard = () => {
                                 <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                                     Group {group.id}
                                 </span>
-                                <ChevronRight size={20} className="opacity-80" />
                             </div>
                         </div>
 
@@ -99,10 +99,12 @@ export const Dashboard = () => {
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {group.teams.map(teamId => (
-                                        <div
+                                        <button
                                             key={teamId}
+                                            type="button"
                                             title={TEAM_NAME_MAP[teamId] ?? teamId}
-                                            className="bg-white rounded-xl flex items-center gap-2.5 border border-slate-200 shadow-sm overflow-hidden hover:border-brand-blue/30 hover:shadow transition-all min-w-0"
+                                            onClick={() => onSelectTeam?.(teamId)}
+                                            className="bg-white rounded-xl flex items-center gap-2.5 border border-slate-200 shadow-sm overflow-hidden hover:border-brand-blue/30 hover:shadow transition-all min-w-0 cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-brand-blue/30"
                                         >
                                             <span className="flex items-center justify-center w-12 h-9 bg-slate-50 border-r border-slate-100 shrink-0 overflow-hidden">
                                                 {getFlagSrc(teamId) ? (
@@ -114,12 +116,16 @@ export const Dashboard = () => {
                                             <span className="font-bold text-slate-800 text-xs uppercase tracking-wide py-2 pr-3">
                                                 {teamId}
                                             </span>
-                                        </div>
+                                        </button>
                                     ))}
                                 </div>
-                                <p className="text-xs text-brand-blue font-medium mt-3 flex items-center gap-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedGroupId(group.id)}
+                                    className="text-xs text-brand-blue font-medium mt-3 flex items-center gap-1 hover:underline focus:outline-none focus:ring-2 focus:ring-brand-blue/30 rounded"
+                                >
                                     {t('dashboard.view_match_schedule') ?? '查看對戰表'} <ChevronRight size={14} />
-                                </p>
+                                </button>
                             </div>
                         </div>
                     </motion.div>

@@ -156,7 +156,7 @@ function App() {
                         {selectedTeam ? (
                             <TeamDetail teamId={selectedTeam} onBack={() => setSelectedTeam(null)} />
                         ) : activeTab === 'dashboard' ? (
-                            <Dashboard />
+                            <Dashboard onSelectTeam={(id) => { setActiveTab('teams'); setSelectedTeam(id); }} />
                         ) : activeTab === 'teams' ? (
                             <TeamList onSelect={(id) => setSelectedTeam(id)} />
                         ) : activeTab === 'groups' ? (
