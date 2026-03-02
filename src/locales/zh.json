@@ -1,0 +1,14 @@
+{
+  "common": {
+    "title": "WBC 2026 戰力分析",
+    "teams": "隊伍",
+    "groups": "分組",
+    "predict": "路徑分析",
+    "loading": "載入中...",
+    "language": "語言"
+  },
+  "teams": {
+    "p_advance": "晉級機率",
+    "strength": "戰力指標"
+  }
+}

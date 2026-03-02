@@ -1,0 +1,14 @@
+{
+    "common": {
+        "title": "WBC 2026 Analysis",
+        "teams": "Teams",
+        "groups": "Groups",
+        "predict": "Route Predictor",
+        "loading": "Loading...",
+        "language": "Language"
+    },
+    "teams": {
+        "p_advance": "Advancement Prob.",
+        "strength": "Strength Index"
+    }
+}
