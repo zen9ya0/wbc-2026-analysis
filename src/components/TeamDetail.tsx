@@ -7,6 +7,11 @@ interface Player {
     name: string;
     position: string;
     number: number;
+    bat_throw?: string | null;
+    height_weight?: string | null;
+    w_l?: string | null;
+    era?: string | null;
+    birthplace?: string | null;
 }
 
 interface TeamDetailProps {
@@ -157,20 +162,34 @@ export const TeamDetail = ({ teamId, onBack }: TeamDetailProps) => {
                                         {POSITION_LABELS[groupKey]}
                                     </div>
                                     <div className="grid gap-2">
-                                        {list.map((p) => (
-                                            <div
-                                                key={p.id}
-                                                className="flex items-center gap-3 py-2 px-3 rounded-xl bg-white border border-slate-100 hover:border-brand-blue/20 hover:shadow-sm transition-all"
-                                            >
-                                                <span className="w-9 h-9 rounded-lg bg-brand-navy/10 text-brand-navy flex items-center justify-center font-bold text-xs shrink-0">
-                                                    #{p.number}
-                                                </span>
-                                                <div className="min-w-0">
-                                                    <div className="font-semibold text-slate-800">{p.name}</div>
-                                                    <div className="text-xs text-slate-400 uppercase">{p.position}</div>
+                                        {list.map((p) => {
+                                            const dash = '—';
+                                            const row = (label: string, value: string | null | undefined) =>
+                                                (value != null && value !== '') ? value : dash;
+                                            return (
+                                                <div
+                                                    key={p.id}
+                                                    className="py-3 px-3 rounded-xl bg-white border border-slate-100 hover:border-brand-blue/20 hover:shadow-sm transition-all space-y-1.5"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="w-9 h-9 rounded-lg bg-brand-navy/10 text-brand-navy flex items-center justify-center font-bold text-xs shrink-0">
+                                                            #{p.number}
+                                                        </span>
+                                                        <div className="min-w-0">
+                                                            <div className="font-semibold text-slate-800">{p.name}</div>
+                                                            <div className="text-xs text-slate-400 uppercase">{p.position}</div>
+                                                        </div>
+                                                    </div>
+                                                    <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[11px] text-slate-500 mt-2 pl-0">
+                                                        <dt className="font-medium text-slate-400">B/T</dt><dd>{row('B/T', p.bat_throw)}</dd>
+                                                        <dt className="font-medium text-slate-400">H/W</dt><dd>{row('H/W', p.height_weight)}</dd>
+                                                        <dt className="font-medium text-slate-400">W-L</dt><dd>{row('W-L', p.w_l)}</dd>
+                                                        <dt className="font-medium text-slate-400">ERA</dt><dd>{row('ERA', p.era)}</dd>
+                                                        <dt className="font-medium text-slate-400">Birthplace</dt><dd>{row('Birthplace', p.birthplace)}</dd>
+                                                    </dl>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             );
