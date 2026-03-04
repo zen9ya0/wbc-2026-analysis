@@ -6,6 +6,7 @@ import {
     LayoutDashboard,
     Users,
     Layers,
+    Trophy,
     Navigation2,
     BarChart3,
     Globe2,
@@ -21,6 +22,7 @@ const languages = [
 import { TeamList } from './components/TeamList';
 import { Dashboard } from './components/Dashboard';
 import { Groups } from './components/Groups';
+import { Rankings } from './components/Rankings';
 import { TeamDetail } from './components/TeamDetail';
 import { Predict } from './components/Predict';
 import { ModelPage } from './components/ModelPage';
@@ -58,6 +60,9 @@ function App() {
         } else if (pathname.startsWith('/groups')) {
             setActiveTab('groups');
             setSelectedTeam(null);
+        } else if (pathname === '/rankings') {
+            setActiveTab('rankings');
+            setSelectedTeam(null);
         } else if (pathname === '/predict') {
             setActiveTab('predict');
             setSelectedTeam(null);
@@ -71,6 +76,7 @@ function App() {
         { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
         { id: 'teams', icon: Users, label: t('common.teams') },
         { id: 'groups', icon: Layers, label: t('common.groups') },
+        { id: 'rankings', icon: Trophy, label: t('common.rankings') },
         { id: 'predict', icon: Navigation2, label: t('common.predict') },
         { id: 'model', icon: BarChart3, label: t('common.model') },
     ];
@@ -207,6 +213,8 @@ function App() {
                             <TeamList onSelect={(id) => goToTab('teams', id)} />
                         ) : activeTab === 'groups' ? (
                             <Groups />
+                        ) : activeTab === 'rankings' ? (
+                            <Rankings />
                         ) : activeTab === 'predict' ? (
                             <Predict />
                         ) : activeTab === 'model' ? (

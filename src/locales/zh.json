@@ -3,6 +3,7 @@
     "title": "WBC 2026 戰力分析",
     "teams": "隊伍",
     "groups": "分組",
+    "rankings": "排名",
     "predict": "路徑分析",
     "model": "模型版本",
     "loading": "載入中...",
@@ -53,6 +54,15 @@
     "last_updated": "最後更新",
     "refresh": "重新整理",
     "auto_update_hint": "對戰表每 30 秒自動更新"
+  },
+  "rankings": {
+    "semifinal_title": "四強爭霸",
+    "slot": "席次",
+    "group_standings_title": "分組排名",
+    "standings_hint": "依已登錄比賽結果自動排序；尚無賽果時名次顯示為 --。",
+    "group": "分組",
+    "rank": "名次",
+    "team": "隊伍"
   },
   "predict": {
     "select_team": "選擇隊伍",

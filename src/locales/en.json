@@ -3,6 +3,7 @@
         "title": "WBC 2026 Analysis",
         "teams": "Teams",
         "groups": "Groups",
+        "rankings": "Rankings",
         "predict": "Route Predictor",
         "model": "Model",
         "loading": "Loading...",
@@ -53,6 +54,15 @@
         "last_updated": "Last updated",
         "refresh": "Refresh",
         "auto_update_hint": "Schedule auto-updates every 30 seconds"
+    },
+    "rankings": {
+        "semifinal_title": "Final Four",
+        "slot": "Slot",
+        "group_standings_title": "Group standings",
+        "standings_hint": "Standings are sorted by match results. When no results yet, rank shows --.",
+        "group": "Group",
+        "rank": "Rank",
+        "team": "Team"
     },
     "predict": {
         "select_team": "Select team",

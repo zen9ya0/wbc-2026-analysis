@@ -3,6 +3,7 @@
         "title": "WBC 2026 戦力分析",
         "teams": "チーム",
         "groups": "グループ",
+        "rankings": "ランキング",
         "predict": "進出ルート",
         "model": "モデル",
         "loading": "読み込み中...",
@@ -53,6 +54,15 @@
         "last_updated": "最終更新",
         "refresh": "更新",
         "auto_update_hint": "対戦表は30秒ごとに自動更新"
+    },
+    "rankings": {
+        "semifinal_title": "準決勝進出",
+        "slot": "席",
+        "group_standings_title": "グループ順位",
+        "standings_hint": "試合結果に基づいて順位表示。結果未登録時は順位を -- で表示。",
+        "group": "グループ",
+        "rank": "順位",
+        "team": "チーム"
     },
     "predict": {
         "select_team": "チームを選択",
